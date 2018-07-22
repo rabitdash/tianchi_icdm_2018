@@ -34,7 +34,7 @@ class ConvLSTMCell(tf.nn.rnn_cell.RNNCell):
   def output_size(self):
     return self._size
 
-  def call(self, x, state):
+  def __call__(self, x, state):
     c, h = state
 
     x = tf.concat([x, h], axis=self._feature_axis)
