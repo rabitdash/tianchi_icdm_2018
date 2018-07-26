@@ -30,8 +30,10 @@ var/
 *.spec
 
 data
+npydata
+!data/checkpoint.h5
 .vscode
-
+.idea
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
