@@ -7,7 +7,7 @@ import numpy as np
 import pylab as plt
 
 #Constants
-IMAGE_SHAPE = {'width':50, 'height':50}
+IMAGE_SHAPE = {'width':250, 'height':250}
 BATCH_SIZE = 10
 DATA_PATH = '../data'
 filter_size = 50
@@ -55,19 +55,19 @@ class Model():
         
         self.seq.add(Conv3D(filters=1, 
                     kernel_size=(3, 3, 3),
-                    activation='tanh',
+                    activation='sigmoid',
                     padding='same', 
                     data_format='channels_last'))
         # self.seq.add(keras.layers.LeakyReLU(alpha=0.3))
                     
-        self.seq.compile(loss='binary_crossentropy', optimizer='rmsprop')
+        self.seq.compile(loss='binary_crossentropy', optimizer='adadelta')
         if weights_file != '':
             self.seq.load_weights(weights_file)
 
     # def set_train_data(self, data):
     #     self.data = np.array(data)
 
-    def train(self, data, size=8, epoch=10, validation_split=0.05):
+    def train(self, data, size=5, epoch=10, validation_split=0.05):
         # print("Train step{}".format(self.train_count))
         # data = data[::,::,::,::,::]
         # data = data[::,::,:250,:250,::]
@@ -84,9 +84,9 @@ class Model():
     def predict(self, data, steps=7):
         # data = data[::,::,::,::,::]
         # data = data[::,::,:50,:50,::]
-        track2 = data[4][::,::,::,::]
-        track = data[4][:steps,::,::,::]
-        a = len(data[4])
+        track2 = data[3][::,::,::,::]
+        track = data[3][:steps,::,::,::]
+        a = len(data[3])
         for j in range(a - steps + 1):
             new_pos = self.seq.predict(track[np.newaxis, ::, ::, ::,::])
             new = new_pos[::, -1, ::, ::,::]
