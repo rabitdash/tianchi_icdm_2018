@@ -15,12 +15,6 @@ n_frames = 61
 def build(path='../data'):
     folders = os.listdir(path)
     folders.sort()
-
-    # built_folder = []
-    # with open(save_path + 'build_list.txt', 'r', encoding='utf-8') as f:
-    #     built_folder = f.readlines()
-    #     built_folder = [x.strip('\n') for x in built_folder]
-    #     print(built_folder)
     
     #去除重复文件夹
     # folders = list(set(folders + built_folder))
@@ -34,14 +28,10 @@ def build(path='../data'):
         for i in range(0, len(samples), batch_size):
             n_part += 1
             arg_samples_path = samples[i:i+batch_size]
-            # build_samples(n_part, arg_samples_path, folder)
             p.apply_async(build_samples, args=(n_part, arg_samples_path, folder))
         p.close()
         p.join()
         print('finish build {}'.format(folder))
-
-        # with open(save_path + 'build_list.txt', 'a', encoding='utf-8') as f:
-        #     f.write(folder + '\n')
 
 def build_samples(n_part, samples_path, folder_name):
     movie = np.zeros((batch_size, 61, 51, 51, 1), dtype=np.float)
@@ -65,9 +55,6 @@ def build_samples(n_part, samples_path, folder_name):
                                     dtype=np.float32)
             movie[i,j,::,::,0] = pic_nparray[::10,::10] # downsample
             print(pic)
-            # pics_list.append(pic_nparray)
-        # pics_nparray = np.array(pics_list)
-        # sample_list.append(pics_nparray)
         print("part{} progress {}/{}".format(n_part, i + 1, batch_size))
     movie = movie[::,::,:50,:50,::] # cut picture
     print(len(movie[0][0]))

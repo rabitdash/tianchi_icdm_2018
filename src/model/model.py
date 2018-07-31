@@ -6,8 +6,10 @@ BatchNormalization = keras.layers.BatchNormalization
 import numpy as np
 import pylab as plt
 
-#Constants
-IMAGE_SHAPE = {'width':250, 'height':250}
+# Constants
+# 接受50x50图片作为输入
+# 数组格式为[n_sample, n_frame, row, col, value]
+IMAGE_SHAPE = {'width':50, 'height':50}
 BATCH_SIZE = 10
 DATA_PATH = '../data'
 filter_size = 50
@@ -18,38 +20,23 @@ class Model():
         self.weights_file = weights_file
         self.seq = Sequential()
         self.history = {}
-        # self.seq.add(keras.layers.InputLayer(
-        #     input_shape=(None, IMAGE_SHAPE['width'], IMAGE_SHAPE['height'], 1),
-        #     dtype=np.float32)
-        # )
-        # self.seq.add(BatchNormalization())
-        # self.seq.add(keras.layers.Conv2D(filters=1, kernel_size=(3,3), data_format='channels_last'))
-        # self.seq.add(keras.layers.MaxPooling2D(pool_size=(2,2)))
-        # self.seq.add(keras.layers.Conv3D(filters=1, kernel_size=(3,3,3), data_format='channels_last'))
-        # self.seq.add(keras.layers.MaxPooling2D(pool_size=(2,2)))
         self.seq.add(ConvLSTM2D(filters=20, 
                         kernel_size=(3, 3),
                         input_shape=(None, IMAGE_SHAPE['width'], IMAGE_SHAPE['height'], 1),
                         padding='same', 
                         return_sequences=True))
-        # self.seq.add(keras.layers.MaxPooling3D(pool_size=(5,5,5),padding='same'))
         self.seq.add(BatchNormalization())
-        # self.seq.add(keras.layers.MaxPooling3D(2,2,2))
-        # self.seq.add(keras.layers.GaussianNoise(stddev))
         self.seq.add(ConvLSTM2D(filters=20, kernel_size=(3, 3),
                         padding='same', return_sequences=True))
-        # self.seq.add(keras.layers.MaxPooling3D((5,5,5), padding='same'))
         self.seq.add(BatchNormalization())
 
         
         self.seq.add(ConvLSTM2D(filters=20, kernel_size=(3, 3),
                         padding='same', return_sequences=True))
-        # self.seq.add(keras.layers.MaxPooling3D((2,2,2), padding='same'))
         self.seq.add(BatchNormalization())
 
         self.seq.add(ConvLSTM2D(filters=20, kernel_size=(3, 3),
                         padding='same', return_sequences=True))
-        # self.seq.add(keras.layers.UpSampling3D((5,5,5)))
         self.seq.add(BatchNormalization())
 
         
@@ -58,20 +45,13 @@ class Model():
                     activation='sigmoid',
                     padding='same', 
                     data_format='channels_last'))
-        # self.seq.add(keras.layers.LeakyReLU(alpha=0.3))
                     
         self.seq.compile(loss='binary_crossentropy', optimizer='adadelta')
         if weights_file != '':
             self.seq.load_weights(weights_file)
 
-    # def set_train_data(self, data):
-    #     self.data = np.array(data)
-
     def train(self, data, size=5, epoch=10, validation_split=0.05):
-        # print("Train step{}".format(self.train_count))
-        # data = data[::,::,::,::,::]
-        # data = data[::,::,:250,:250,::]
-        for i in range(0,10):
+        for i in range(10):
             self.history = self.seq.fit(data[::,:-1,::,::,::], 
                         data[::,1:,::,::,::], 
                         batch_size=size,
@@ -82,8 +62,6 @@ class Model():
             print("weights saved")
          
     def predict(self, data, steps=7):
-        # data = data[::,::,::,::,::]
-        # data = data[::,::,:50,:50,::]
         track2 = data[3][::,::,::,::]
         track = data[3][:steps,::,::,::]
         a = len(data[3])
@@ -98,7 +76,7 @@ class Model():
             ax = fig.add_subplot(121)
 
             if i >= steps:
-                ax.text(1, 3, 'Predictions !', fontsize=20, color='w')
+                ax.text(1, 3, 'Predictions', fontsize=20, color='w')
             else:
                 ax.text(1, 3, 'Initial trajectory', fontsize=20)
 
@@ -109,7 +87,5 @@ class Model():
             plt.text(1, 3, 'Ground truth', fontsize=20)
 
             toplot = track2[i, ::, ::, 0]
-            # if i >= 2:
-            #     toplot = data[3][i - 1, ::, ::, 0]
             plt.imshow(toplot)
             plt.savefig('../prediction/%i_animate.png' % (i + 1))
