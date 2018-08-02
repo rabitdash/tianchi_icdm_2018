@@ -62,3 +62,5 @@ docs/_build/
 target/
 
 *.png
+.mypy_cache
+.idea

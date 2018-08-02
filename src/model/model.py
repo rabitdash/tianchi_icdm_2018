@@ -1,9 +1,12 @@
 import numpy as np
 import pylab as plt
 from tensorflow.contrib import keras
+from .Layers import ConvLSTM2D
+from .Layers import ConvGRU2D
+keras.layers.GRU
 Sequential = keras.models.Sequential
 Conv3D = keras.layers.Conv3D
-ConvLSTM2D = keras.layers.ConvLSTM2D
+# ConvLSTM2D = keras.layers.ConvLSTM2D
 BatchNormalization = keras.layers.BatchNormalization
 
 
@@ -20,24 +23,24 @@ class Model(object):
         self.weights_file = weights_file
         self.seq = Sequential()
         self.history = {}
-        self.seq.add(ConvLSTM2D(filters=40, 
-                        kernel_size=(5, 5),
-                        input_shape=(None, IMAGE_SHAPE['width'], IMAGE_SHAPE['height'], 1),
-                        padding='same', 
-                        return_sequences=True))
-        self.seq.add(BatchNormalization())
-        self.seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+        # self.seq.add(ConvLSTM2D(filters=20, 
+        #                 kernel_size=(5, 5),
+        #                 input_shape=(None, IMAGE_SHAPE['width'], IMAGE_SHAPE['height'], 1),
+        #                 padding='same', 
+        #                 return_sequences=True))
+        # self.seq.add(BatchNormalization())
+        # self.seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
+        #                 padding='same', return_sequences=True))
+        # self.seq.add(BatchNormalization())
+
+        
+        self.seq.add(ConvGRU2D(filters=20, kernel_size=(5, 5),
                         padding='same', return_sequences=True))
         self.seq.add(BatchNormalization())
 
-        
-        # self.seq.add(ConvLSTM2D(filters=20, kernel_size=(3, 3),
-        #                 padding='same', return_sequences=True))
-        # self.seq.add(BatchNormalization())
-
-        # self.seq.add(ConvLSTM2D(filters=20, kernel_size=(3, 3),
-        #                 padding='same', return_sequences=True))
-        # self.seq.add(BatchNormalization())
+        self.seq.add(ConvGRU2D(filters=40, kernel_size=(3, 3),
+                        padding='same', return_sequences=True))
+        self.seq.add(BatchNormalization())
 
         
         self.seq.add(Conv3D(filters=1, 
@@ -58,7 +61,7 @@ class Model(object):
                         epochs=epoch, 
                         validation_split=0.05)
             # print(self.history)
-            self.seq.save_weights('./weights.h5')
+            self.seq.save_weights(self.weights_file)
             print("weights saved")
          
     def predict(self, data, steps=7):

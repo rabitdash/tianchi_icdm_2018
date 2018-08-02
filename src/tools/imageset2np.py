@@ -7,12 +7,12 @@ import time
 import zipfile
 filename_definition = "{}_Part{}" #{folder_definition:}
 batch_size = 1000
-save_path = '../npydata/'
+save_path = '../../npydata/'
 n_build_process = 1 # 多进程数
 n_frames = 61
 # data format: np.Array(n_samples, n_frames, row, col, channels)
 # channels default is 1, n_frames=61
-def build(path='../data'):
+def build(path='../../data'):
     folders = os.listdir(path)
     folders.sort()
     
@@ -68,7 +68,7 @@ def build_samples(n_part, samples_path, folder_name):
     build_time = time.time() - build_time
     print('finished build {} part {}, time:{}'.format(folder_name, n_part, build_time))
 
-def load_data(path='../npydata'):
+def load_data(path='../../npydata'):
     data = os.listdir()
     return np.load('/'.join([path, data[0]]), dtype=float)
 
