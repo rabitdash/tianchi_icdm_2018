@@ -1131,6 +1131,9 @@ class ConvGRU2DCell(Layer):
       recurrent_dropout: Float between 0 and 1.
           Fraction of the units to drop for
           the linear transformation of the recurrent state.
+      reset_after: GRU convention (whether to apply reset gate after or
+        before matrix multiplication). False = "before" (default),
+        True = "after" (CuDNN compatible).
   """
 
   def __init__(self,
@@ -1260,7 +1263,7 @@ class ConvGRU2DCell(Layer):
 
   def call(self, inputs, states, training=None):
     h_tm1 = states[0]  # previous memory state
-
+    print(h_tm1)
     if 0 < self.dropout < 1 and self._dropout_mask is None:
           self._dropout_mask = _generate_dropout_mask(
           array_ops.ones_like(inputs),
@@ -1451,6 +1454,10 @@ class ConvGRU2D(ConvRNN2D):
     recurrent_dropout: Float between 0 and 1.
         Fraction of the units to drop for
         the linear transformation of the recurrent state.
+    reset_after: GRU convention (whether to apply reset gate after or
+        before matrix multiplication). False = "before" (default),
+        True = "after" (CuDNN compatible).
+    
 
   Input shape:
     - if data_format='channels_first'
@@ -1487,7 +1494,7 @@ class ConvGRU2D(ConvRNN2D):
                kernel_size,
                strides=(1, 1),
                padding='valid',
-               data_format=None,
+               data_format='channels_last',
                dilation_rate=(1, 1),
                activation='tanh',
                recurrent_activation='hard_sigmoid',
@@ -1536,6 +1543,7 @@ class ConvGRU2D(ConvRNN2D):
                                      return_sequences=return_sequences,
                                      go_backwards=go_backwards,
                                      stateful=stateful,
+                                     return_state = True,
                                      **kwargs)
     self.activity_regularizer = regularizers.get(activity_regularizer)
 
@@ -1665,7 +1673,7 @@ class ConvGRU2D(ConvRNN2D):
               'dropout': self.dropout,
               'recurrent_dropout': self.recurrent_dropout,
               'reset_after': self.reset_after}
-    base_config = super(ConvLSTM2D, self).get_config()
+    base_config = super(ConvGRU2D, self).get_config()
     del base_config['cell']
     return dict(list(base_config.items()) + list(config.items()))
 
@@ -1728,6 +1736,9 @@ class TrajGRUCell(Layer):
       recurrent_dropout: Float between 0 and 1.
           Fraction of the units to drop for
           the linear transformation of the recurrent state.
+      reset_after: GRU convention (whether to apply reset gate after or
+          before matrix multiplication). False = "before" (default),
+          True = "after" (CuDNN compatible).
   """
 
   def __init__(self,
